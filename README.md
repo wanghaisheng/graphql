@@ -279,7 +279,7 @@ this query would then be:
 ```
 
 Specifying the `query` keyword and an operation name is only required when a
-GraphQL document defines multiple operations.  We therefore could have written
+GraphQL document defines multiple operations. We therefore could have written
 the previous query with the query shorthand:
 
 ```graphql
@@ -362,7 +362,7 @@ which will give us the nested response
     "friends": [
       {
         "name": "Luke Skywalker",
-        "appearsIn": [ "NEWHOPE", "EMPIRE", "JEDI" ],
+        "appearsIn": ["NEWHOPE", "EMPIRE", "JEDI"],
         "friends": [
           { "name": "Han Solo" },
           { "name": "Leia Organa" },
@@ -372,7 +372,7 @@ which will give us the nested response
       },
       {
         "name": "Han Solo",
-        "appearsIn": [ "NEWHOPE", "EMPIRE", "JEDI" ],
+        "appearsIn": ["NEWHOPE", "EMPIRE", "JEDI"],
         "friends": [
           { "name": "Luke Skywalker" },
           { "name": "Leia Organa" },
@@ -381,7 +381,7 @@ which will give us the nested response
       },
       {
         "name": "Leia Organa",
-        "appearsIn": [ "NEWHOPE", "EMPIRE", "JEDI" ],
+        "appearsIn": ["NEWHOPE", "EMPIRE", "JEDI"],
         "friends": [
           { "name": "Luke Skywalker" },
           { "name": "Han Solo" },
@@ -1127,4 +1127,4 @@ system, query execution, validation, and introspection systems. There's more
 in both [GraphQL.js](https://github.com/graphql/graphql-js/) and specification,
 including a description and implementation for executing queries, how to format
 a response, explaining how a type system maps to an underlying implementation,
-and how to format a GraphQL response, as well as a grammar for GraphQL.
+and how to format a GraphQL response, as well as the grammar for GraphQL.

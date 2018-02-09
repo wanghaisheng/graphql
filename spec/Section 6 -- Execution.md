@@ -5,7 +5,7 @@ GraphQL generates a response from a request via execution.
 A request for execution consists of a few pieces of information:
 
 * The schema to use, typically solely provided by the GraphQL service.
-* A Document containing GraphQL Operations and Fragments to execute.
+* A {Document} which must contain GraphQL {OperationDefinition} and may contain {FragmentDefinition}.
 * Optionally: The name of the Operation in the Document to execute.
 * Optionally: Values for any Variables defined by the Operation.
 * An initial value corresponding to the root type being executed.
@@ -19,12 +19,11 @@ to be formatted according to the Response section below.
 
 ## Executing Requests
 
-To execute a request, the executor must have a parsed `Document` (as defined
-in the “Query Language” part of this spec) and a selected operation name to
-run if the document defines multiple operations, otherwise the document is
-expected to only contain a single operation. The result of the request is
-determined by the result of executing this operation according to the "Executing
-Operations” section below.
+To execute a request, the executor must have a parsed {Document} and a selected
+operation name to run if the document defines multiple operations, otherwise the
+document is expected to only contain a single operation. The result of the
+request is determined by the result of executing this operation according to the
+"Executing Operations” section below.
 
 ExecuteRequest(schema, document, operationName, variableValues, initialValue):
 
@@ -104,7 +103,7 @@ Note: This algorithm is very similar to {CoerceArgumentValues()}.
 
 ## Executing Operations
 
-The type system, as described in the “Type System” section of the spec, must
+The type system, as described in the "Type System" section of the spec, must
 provide a query root object type. If mutations or subscriptions are supported,
 it must also provide a mutation or subscription root object type, respectively.
 
@@ -212,7 +211,7 @@ must receive no more events from that event stream.
 
 **Supporting Subscriptions at Scale**
 
-Supporting subscriptions is a significant change for any GraphQL server. Query
+Supporting subscriptions is a significant change for any GraphQL service. Query
 and mutation operations are stateless, allowing scaling via cloning of GraphQL
 server instances. Subscriptions, by contrast, are stateful and require
 maintaining the GraphQL document, variables, and other context over the lifetime
@@ -233,10 +232,15 @@ CreateSourceEventStream(subscription, schema, variableValues, initialValue):
 
   * Let {subscriptionType} be the root Subscription type in {schema}.
   * Assert: {subscriptionType} is an Object type.
-  * Let {selectionSet} be the top level Selection Set in {subscription}.
-  * Let {rootField} be the first top level field in {selectionSet}.
-  * Let {argumentValues} be the result of {CoerceArgumentValues(subscriptionType, rootField, variableValues)}.
-  * Let {fieldStream} be the result of running {ResolveFieldEventStream(subscriptionType, initialValue, rootField, argumentValues)}.
+  * Let {groupedFieldSet} be the result of
+    {CollectFields(subscriptionType, selectionSet, variableValues)}.
+  * If {groupedFieldSet} does not have exactly one entry, throw a query error.
+  * Let {fields} be the value of the first entry in {groupedFieldSet}.
+  * Let {fieldName} be the name of the first entry in {fields}.
+    Note: This value is unaffected if an alias is used.
+  * Let {field} be the first entry in {fields}.
+  * Let {argumentValues} be the result of {CoerceArgumentValues(subscriptionType, field, variableValues)}
+  * Let {fieldStream} be the result of running {ResolveFieldEventStream(subscriptionType, initialValue, fieldName, argumentValues)}.
   * Return {fieldStream}.
 
 ResolveFieldEventStream(subscriptionType, rootValue, fieldName, argumentValues):
@@ -284,7 +288,7 @@ payloads for a subscription. This may in turn also cancel the Source Stream.
 This is also a good opportunity to clean up any other resources used by
 the subscription.
 
-Unsubscribe(responseStream)
+Unsubscribe(responseStream):
 
   * Cancel {responseStream}
 
